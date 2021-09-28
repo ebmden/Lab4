@@ -233,6 +233,7 @@ def receive_lines():
     :rtype:
     :author: Eden Basso
     """
+    print('this is a test')
 
 def write_lines_to_file():
     """
