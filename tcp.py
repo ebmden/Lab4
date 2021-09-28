@@ -1,11 +1,10 @@
 """
-- NOTE: REPLACE 'N' Below with your section, year, and lab number
-- CS2911 - 0NN
-- Fall 202N
-- Lab N
+- CS2911 - 011
+- Fall 2021
+- Lab 4 - Receiving Messages
 - Names:
-  -
-  -
+  - Lucas Gral
+  - Eden Basso
 
 A simple TCP server/client pair.
 
@@ -18,12 +17,12 @@ The server responds with 'A' when it accepts the file.
 Then the client can send the next file.
 
 
-Introduction: (Describe the lab in your own words)
+Introduction: (Describe the lab in your own words) - LG
 
 
 
 
-Summary: (Summarize your experience with the lab, what you learned, what you liked, what you disliked, and any suggestions you have for improvement)
+Summary: (Summarize your experience with the lab, what you learned, what you liked, what you disliked, and any suggestions you have for improvement) - EB
 
 
 
@@ -135,6 +134,7 @@ def tcp_receive(listen_port):
     - Close data connection.
 
     :param int listen_port: Port number on the server to listen on
+    :author: Lucas Gral
     """
 
     print('tcp_receive (server): listen_port={0}'.format(listen_port))
@@ -149,6 +149,14 @@ def tcp_receive(listen_port):
     data_socket.close()
 
 def receive_data(data_socket, fileNum):
+    """
+
+    :param data_socket:
+    :param fileNum:
+    :return:
+    :rtype:
+    :author: Lucas Gral
+    """
     numLines = receive_num_lines(data_socket)
     lines = receive_lines(data_socket, numLines)
     write_lines_to_file(lines, fileNum)
@@ -172,6 +180,70 @@ def next_byte(data_socket):
     """
     return data_socket.recv(1)
 
+
+def create_listen_socket():
+    """
+    ...
+
+    :param:
+    :return:
+    :rtype:
+    :author: Lucas Gral
+    """
+
+
+def create_data_socket():
+    """
+    ...
+
+    :param:
+    :return:
+    :rtype:
+    :author: Eden Basso
+    """
+
+def receive_data():
+    """
+    ...
+
+    :param:
+    :param:
+    :return:
+    :rtype:
+    :author: Lucas Gral
+    """
+
+def receive_num_lines():
+    """
+    ...
+
+    :param:
+    :return:
+    :rtype:
+    :author: Lucas Gral
+    """
+
+def receive_lines():
+    """
+    ...
+
+    :param:
+    :param:
+    :return:
+    :rtype:
+    :author: Eden Basso
+    """
+
+def write_lines_to_file():
+    """
+    ...
+
+    :param:
+    :param:
+    :return:
+    :rtype:
+    :author: Eden Basso
+    """
 
 # Invoke the main method to run the program.
 main()
