@@ -140,30 +140,13 @@ def tcp_receive(listen_port):
     print('tcp_receive (server): listen_port={0}'.format(listen_port))
 
     listen_socket = create_listen_socket(listen_port)
-    #print adress of sender
     data_socket = create_data_socket(listen_socket)
+    # print adress of data socket, maybe create_data_socket should return a tuple (data_socket, client_IP)
 
-    receive_data(data_socket, 1)
-    #test comment for git
+    receive_data(data_socket, 1) #TODO: test once everything else is implemented
 
     listen_socket.close()
     data_socket.close()
-
-def receive_data(data_socket, fileNum):
-    """
-
-    :param data_socket:
-    :param fileNum:
-    :return:
-    :rtype:
-    :author: Lucas Gral
-    """
-    numLines = receive_num_lines(data_socket)
-    lines = receive_lines(data_socket, numLines)
-    write_lines_to_file(lines, fileNum)
-    #send_response
-    if lines isnt empty:
-        receive_data(data_socket, fileNum+1)
 
 def next_byte(data_socket):
     """
@@ -182,16 +165,20 @@ def next_byte(data_socket):
     return data_socket.recv(1)
 
 
-def create_listen_socket():
+def create_listen_socket(listen_port):
     """
-    ...
+    Creates the socket that listens for any connections.
 
-    :param:
-    :return:
-    :rtype:
+    :param listen_port: The port to listen on
+    :return: the listening socket
+    :rtype: socket
     :author: Lucas Gral
     """
-
+    listenSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listenSocket.bind((LISTEN_ON_INTERFACE, listen_port))
+    listenSocket.listen(1) #accept 1 connection
+    #listenSocket.accept() is done in create_data_socket()
+    return listenSocket
 
 def create_data_socket():
     """
@@ -203,26 +190,41 @@ def create_data_socket():
     :author: Eden Basso
     """
 
-def receive_data():
+def receive_data(data_socket, fileNum):
     """
-    ...
+    Recursive function that receives data from the socket connection until an empty line is received.
+    Receiving lines is handled by receive_lines
+    Saving the results to a file is handled by write_lines_to_file
 
-    :param:
-    :param:
-    :return:
-    :rtype:
+    :param data_socket: the socket to receive from and send to
+    :param fileNum: the Nth recursion of this function for the filename; should start at 1
     :author: Lucas Gral
     """
+    numLines = receive_num_lines(data_socket)
+    lines = receive_lines(data_socket, numLines)
+    write_lines_to_file(lines, fileNum)
+    if numLines > 0:
+        #RESPOND 'A'
+        data_socket.sendall(b'A')
+        receive_data(data_socket, fileNum+1) #recurse
+    else:
+        #RESPOND 'Q'
+        data_socket.sendall(b'Q')
 
-def receive_num_lines():
+def receive_num_lines(data_socket):
     """
-    ...
+    gets the number of lines for the next file (assuming the next data to be received is the number of lines)
 
-    :param:
-    :return:
-    :rtype:
+    :param data_socket: the socket to receive on
+    :return: the number of lines
+    :rtype: int
     :author: Lucas Gral
     """
+    numLinesBytes = b'';
+    for i in range(0, 4): #call four times
+        numLinesBytes += next_byte(data_socket)
+
+    return int.from_bytes(numLinesBytes, 'big') #TODO: double check once test-able
 
 def receive_lines():
     """
