@@ -143,7 +143,7 @@ def tcp_receive(listen_port):
     data_socket = create_data_socket(listen_socket)
     # print adress of data socket, maybe create_data_socket should return a tuple (data_socket, client_IP)
 
-    receive_data(data_socket, 1) #TODO: test once everything else is implemented
+    receive_data(data_socket, 1) #TODO: test once everything else is implemented (delete these TODO comments if they stop you from pushing to the repo)
 
     listen_socket.close()
     data_socket.close()
