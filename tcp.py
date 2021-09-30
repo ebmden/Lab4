@@ -172,7 +172,7 @@ def create_listen_socket(listen_port):
 
     :param listen_port: The port to listen on
     :return: the listening socket
-    :rtype: socket
+    :rtype: socket.pyi
     :author: Lucas Gral
     """
     listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -186,9 +186,9 @@ def create_data_socket(listen_socket):
     """
     Creates a client data socket and connects it to the server
 
-    :param: socket.pyi listen_socket: socket that listens for a signal
-    :return: data_socket: the socket that receives data
-    :rtype: tuple
+    :param socket.pyi listen_socket: socket that listens for a signal
+    :return: the socket that receives data
+    :rtype: socket.pyi
     :author: Eden Basso
     """
     data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -239,16 +239,16 @@ def receive_lines(data_socket, num_lines):
     """
     Determines the size of each line in order to convert data into bytes object
 
-    :param: socket.pyi data_socket: the socket to receive on
-    :param: int num_lines: the number of lines of data that need to be iterated through
-    :return: data: the message that will be sent to a text file
+    :param socket.pyi data_socket: the socket to receive on
+    :param int num_lines: the number of lines of data that need to be iterated through
+    :return: the message that will be sent to a text file
     :rtype: any
     :author: Eden Basso
     """
     # use next_byte() to iterate through each line in data_socket num_lines times to find the size of each line
     response_size = 0
     byte_line = b''
-    for i in num_lines:
+    for i in range(num_lines):
         while (message_byte := next_byte(data_socket)) != b'\x0d\x0a':
             byte_line = byte_line + message_byte
             response_size = response_size + 1
@@ -261,9 +261,9 @@ def write_lines_to_file(lines, file_number):
     """
     Writes raw bytes object into a file until an empty file is written
 
-    :param: any lines: data in raw bytes ready to be stored in a file
-    :param: int file_number: the numeric order in which the current file is being written/names as
-    :return: file: file with message
+    :param any lines: data in raw bytes ready to be stored in a file
+    :param int file_number: the numeric order in which the current file is being written/names as
+    :return: file with message
     :rtype: file
     :author: Eden Basso
     """
