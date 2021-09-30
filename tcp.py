@@ -34,6 +34,7 @@ import socket
 import struct
 import time
 import sys
+import os
 
 # Port number definitions
 # (May have to be adjusted if they collide with ports in use by other programs/services.)
@@ -42,7 +43,7 @@ TCP_PORT = 12100
 # Address to listen on when acting as server.
 # The address '' means accept any connection for our 'receive' port from any network interface
 # on this system (including 'localhost' loopback connection).
-LISTEN_ON_INTERFACE = 'localhost' #empty by default
+LISTEN_ON_INTERFACE = 'localhost'  # empty by default
 
 # Address of the 'other' ('server') host that should be connected to for 'send' operations.
 # When connecting on one system, use 'localhost'
@@ -267,11 +268,17 @@ def write_lines_to_file(lines, file_number):
     :rtype: file
     :author: Eden Basso
     """
-    file_number = str(file_number)
-    file = open('file' + file_number)
-    file.write(lines)
-    file.close()
-    return file
+    does_exist = True
+    while does_exist == True:
+        file_number = str(file_number)
+        does_exist = os.access('file' + file_number, os.F_OK)
+        if does_exist == False:
+            message_file = os.open('file' + file_number, os.O_CREAT | os.O_RDWR)
+            os.write(message_file, lines)
+            os.close(message_file)
+        file_number = int(file_number)
+        file_number = file_number + 1
+    return message_file
 
 
 # Invoke the main method to run the program.
