@@ -148,6 +148,7 @@ def tcp_receive(listen_port):
     listen_socket.close()
     data_socket.close()
 
+
 def next_byte(data_socket):
     """
     Read the next byte from the socket data_socket.
@@ -174,42 +175,49 @@ def create_listen_socket(listen_port):
     :rtype: socket
     :author: Lucas Gral
     """
-    listenSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listenSocket.bind((LISTEN_ON_INTERFACE, listen_port))
-    listenSocket.listen(1) #accept 1 connection
+    listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    listen_socket.bind((LISTEN_ON_INTERFACE, listen_port))
+    listen_socket.listen(1) #accept 1 connection
     #listenSocket.accept() is done in create_data_socket()
-    return listenSocket
+    return listen_socket
 
-def create_data_socket():
+
+def create_data_socket(listen_socket):
     """
-    ...
+    Creates a client data socket and connects it to the server
 
-    :param:
-    :return:
-    :rtype:
+    :param: socket.pyi listen_socket: socket that listens for a signal
+    :return: data_socket: the socket that receives data
+    :rtype: tuple
     :author: Eden Basso
     """
+    data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    data_socket.connect((OTHER_HOST, TCP_PORT))
+    (data_socket, sender_address) = listen_socket.accept()
+    return data_socket
 
-def receive_data(data_socket, fileNum):
+
+def receive_data(data_socket, file_number):
     """
     Recursive function that receives data from the socket connection until an empty line is received.
     Receiving lines is handled by receive_lines
     Saving the results to a file is handled by write_lines_to_file
 
     :param data_socket: the socket to receive from and send to
-    :param fileNum: the Nth recursion of this function for the filename; should start at 1
+    :param file_number: the Nth recursion of this function for the filename; should start at 1
     :author: Lucas Gral
     """
-    numLines = receive_num_lines(data_socket)
-    lines = receive_lines(data_socket, numLines)
-    write_lines_to_file(lines, fileNum)
-    if numLines > 0:
+    num_lines = receive_num_lines(data_socket)
+    lines = receive_lines(data_socket, num_lines)
+    write_lines_to_file(lines, file_number)
+    if num_lines > 0:
         #RESPOND 'A'
         data_socket.sendall(b'A')
-        receive_data(data_socket, fileNum+1) #recurse
+        receive_data(data_socket, file_number+1) #recurse
     else:
         #RESPOND 'Q'
         data_socket.sendall(b'Q')
+
 
 def receive_num_lines(data_socket):
     """
@@ -220,34 +228,51 @@ def receive_num_lines(data_socket):
     :rtype: int
     :author: Lucas Gral
     """
-    numLinesBytes = b'';
+    num_lines_bytes = b''
     for i in range(0, 4): #call four times
-        numLinesBytes += next_byte(data_socket)
+        num_lines_bytes += next_byte(data_socket)
 
-    return int.from_bytes(numLinesBytes, 'big') #TODO: double check once test-able
+    return int.from_bytes(num_lines_bytes, 'big') #TODO: double check once test-able
 
-def receive_lines():
+
+def receive_lines(data_socket, num_lines):
     """
-    ...
+    Determines the size of each line in order to convert data into bytes object
 
-    :param:
-    :param:
+    :param: socket.pyi data_socket: the socket to receive on
+    :param: int num_lines: the number of lines of data that need to be iterated through
+    :return: data: the message that will be sent to a text file
+    :rtype: any
+    :author: Eden Basso
+    """
+    # use next_byte() to iterate through each line in data_socket num_lines times to find the size of each line
+    response_size = 0
+    byte_line = b''
+    for i in num_lines:
+        while (message_byte := next_byte(data_socket)) != b'\x0d\x0a':
+            byte_line = byte_line + message_byte
+            response_size = response_size + 1
+        byte_line = byte_line + b'\n'
+    data = data_socket.recv(response_size)
+    return data
+
+
+def write_lines_to_file(lines, file_number):
+    """
+    Writes raw bytes object into a file until an empty file is written
+
+    :param: any lines: data in raw bytes ready to be stored in a file
+    :param: int file_number: the numeric order in which the current file is being written/names as
     :return:
     :rtype:
     :author: Eden Basso
     """
-    print('this is a test')
+    file_number = str(file_number)
+    file = open('file' + file_number)
+    file.write(lines)
+    file.close()
+    return file
 
-def write_lines_to_file():
-    """
-    ...
-
-    :param:
-    :param:
-    :return:
-    :rtype:
-    :author: Eden Basso
-    """
 
 # Invoke the main method to run the program.
 main()
