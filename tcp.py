@@ -263,8 +263,8 @@ def write_lines_to_file(lines, file_number):
 
     :param: any lines: data in raw bytes ready to be stored in a file
     :param: int file_number: the numeric order in which the current file is being written/names as
-    :return:
-    :rtype:
+    :return: file: file with message
+    :rtype: file
     :author: Eden Basso
     """
     file_number = str(file_number)
