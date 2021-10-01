@@ -43,7 +43,7 @@ TCP_PORT = 12100
 # Address to listen on when acting as server.
 # The address '' means accept any connection for our 'receive' port from any network interface
 # on this system (including 'localhost' loopback connection).
-LISTEN_ON_INTERFACE = 'localhost'  # empty by default
+LISTEN_ON_INTERFACE = ''  # empty by default
 
 # Address of the 'other' ('server') host that should be connected to for 'send' operations.
 # When connecting on one system, use 'localhost'
@@ -141,7 +141,8 @@ def tcp_receive(listen_port):
     print('tcp_receive (server): listen_port={0}'.format(listen_port))
 
     listen_socket = create_listen_socket(listen_port)
-    data_socket = create_data_socket(listen_socket)
+    (data_socket, sender_address) = create_data_socket(listen_socket)
+    print("Sender address:",sender_address)
     # print adress of data socket, maybe create_data_socket should return a tuple (data_socket, client_IP)
 
     receive_data(data_socket, 1) #TODO: test once everything else is implemented (delete these TODO comments if they stop you from pushing to the repo)
@@ -192,11 +193,10 @@ def create_data_socket(listen_socket):
     :rtype: socket.pyi
     :author: Eden Basso
     """
-    data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    data_socket.connect((OTHER_HOST, TCP_PORT))
+    #data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #data_socket.connect((OTHER_HOST, TCP_PORT))
     (data_socket, sender_address) = listen_socket.accept()
-    return data_socket
-
+    return (data_socket, sender_address)
 
 def receive_data(data_socket, file_number):
     """
@@ -209,8 +209,11 @@ def receive_data(data_socket, file_number):
     :author: Lucas Gral
     """
     num_lines = receive_num_lines(data_socket)
+    print("Receiving", num_lines, "lines.")
+    print("File", file_number)
     lines = receive_lines(data_socket, num_lines)
-    write_lines_to_file(lines, file_number)
+    print(lines)
+    #write_lines_to_file(lines, file_number)
     if num_lines > 0:
         #RESPOND 'A'
         data_socket.sendall(b'A')
@@ -247,15 +250,16 @@ def receive_lines(data_socket, num_lines):
     :author: Eden Basso
     """
     # use next_byte() to iterate through each line in data_socket num_lines times to find the size of each line
-    response_size = 0
-    byte_line = b''
-    for i in range(num_lines):
-        while (message_byte := next_byte(data_socket)) != b'\x0d\x0a':
-            byte_line = byte_line + message_byte
-            response_size = response_size + 1
-        byte_line = byte_line + b'\n'
-    data = data_socket.recv(response_size)
-    return data
+    lines = ''
+
+    for i in range(0, num_lines):
+        byte_line = b''
+        while (message_byte := next_byte(data_socket)) != b'\x0a':
+            byte_line += message_byte
+
+        lines += byte_line.decode('ASCII') + '\x0a'
+
+    return lines
 
 
 def write_lines_to_file(lines, file_number):
