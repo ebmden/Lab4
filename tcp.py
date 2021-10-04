@@ -18,8 +18,15 @@ Then the client can send the next file.
 
 
 Introduction: (Describe the lab in your own words) - LG
-
-
+The goal of this lab is to impliment the tcp_receive function using next_byte.
+tcp_receive should start a TCP server/receiver and listen for another python program running tcp_send.
+tcp_send sends the following over the connection: the number of lines of text for a file, the lines themselves.
+The responses should be saved in files named after which order they have been sent: 1.txt, 2.txt, etc.
+The program we wrote uses many helper methods to break the problem into small parts;
+two are for creating sockets (create_listen_socket, create_data_socket),
+one controls the receiving of data (receive_data),
+receive_num_lines and receive_lines are called in receive_data to handle reading from the connection,
+and write_lines_to_file (which is called in receive_data) saves the most recent file transmited.
 
 
 Summary: (Summarize your experience with the lab, what you learned, what you liked, what you disliked, and any suggestions you have for improvement) - EB
@@ -33,8 +40,8 @@ Summary: (Summarize your experience with the lab, what you learned, what you lik
 import socket
 import struct
 import time
-import sys
-import os
+#import sys
+#import os
 
 # Port number definitions
 # (May have to be adjusted if they collide with ports in use by other programs/services.)
@@ -145,7 +152,7 @@ def tcp_receive(listen_port):
     print("Sender address:",sender_address)
     # print adress of data socket, maybe create_data_socket should return a tuple (data_socket, client_IP)
 
-    receive_data(data_socket, 1) #TODO: test once everything else is implemented (delete these TODO comments if they stop you from pushing to the repo)
+    receive_data(data_socket, 1)
 
     listen_socket.close()
     data_socket.close()
@@ -193,8 +200,6 @@ def create_data_socket(listen_socket):
     :rtype: socket.pyi
     :author: Eden Basso
     """
-    #data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #data_socket.connect((OTHER_HOST, TCP_PORT))
     (data_socket, sender_address) = listen_socket.accept()
     return (data_socket, sender_address)
 
@@ -213,7 +218,7 @@ def receive_data(data_socket, file_number):
     print("File", file_number)
     lines = receive_lines(data_socket, num_lines)
     print(lines)
-    #write_lines_to_file(lines, file_number)
+    write_lines_to_file(lines, file_number)
     if num_lines > 0:
         #RESPOND 'A'
         data_socket.sendall(b'A')
@@ -250,14 +255,15 @@ def receive_lines(data_socket, num_lines):
     :author: Eden Basso
     """
     # use next_byte() to iterate through each line in data_socket num_lines times to find the size of each line
-    lines = ''
+    lines = b''
 
     for i in range(0, num_lines):
         byte_line = b''
         while (message_byte := next_byte(data_socket)) != b'\x0a':
             byte_line += message_byte
 
-        lines += byte_line.decode('ASCII') + '\x0a'
+        #lines += byte_line.decode('ASCII') + '\x0a' #helpful when printing in console, not when writing for files
+        lines += byte_line + b'\r\n'
 
     return lines
 
@@ -272,6 +278,7 @@ def write_lines_to_file(lines, file_number):
     :rtype: file
     :author: Eden Basso
     """
+    """
     does_exist = True
     while does_exist == True:
         file_number = str(file_number)
@@ -283,7 +290,10 @@ def write_lines_to_file(lines, file_number):
         file_number = int(file_number)
         file_number = file_number + 1
     return message_file
-
+    """
+    with open(str(file_number)+'.txt', 'wb') as output_file:
+        output_file.write(lines)
+        output_file.close()
 
 # Invoke the main method to run the program.
 main()
