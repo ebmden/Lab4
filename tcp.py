@@ -29,8 +29,19 @@ receive_num_lines and receive_lines are called in receive_data to handle reading
 and write_lines_to_file (which is called in receive_data) saves the most recent file transmited.
 
 
-Summary: (Summarize your experience with the lab, what you learned, what you liked, what you disliked, and any suggestions you have for improvement) - EB
-
+Summary: (Summarize your experience with the lab, what you learned, what you liked, what you disliked,
+and any suggestions you have for improvement) - EB
+In this lab I learned the ways in which a server interacts with a client and the specific steps needed to execute
+a response and request from each end (server and client). Specifically, I learned how to apply what I learned in class
+about sockets and how they interact with a system's port and the network,
+to successfully request and respond to data being sent over the network. Beyond that,
+I learned how these messages are stored within the system (in this case files), and connected it to the importance of
+needing to store data somewhere: ex. a body of a response that may contain images or audio for the client.
+I liked the aspect of creating files within the program and being able to have hands on experience with the concepts
+we discussed in class. I also liked being able to apply what I learned about data encodings when looking at the
+files the program created. I have no specific suggestions for improvements.
+However, I will note that my partner and I used Git to push to a repository this time around and it was extremely
+helpful when we made updates.
 
 
 
