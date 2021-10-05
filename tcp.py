@@ -51,8 +51,6 @@ helpful when we made updates.
 import socket
 import struct
 import time
-#import sys
-#import os
 
 # Port number definitions
 # (May have to be adjusted if they collide with ports in use by other programs/services.)
@@ -288,19 +286,6 @@ def write_lines_to_file(lines, file_number):
     :return: file with message
     :rtype: file
     :author: Eden Basso
-    """
-    """
-    does_exist = True
-    while does_exist == True:
-        file_number = str(file_number)
-        does_exist = os.access('file' + file_number, os.F_OK)
-        if does_exist == False:
-            message_file = os.open('file' + file_number, os.O_CREAT | os.O_RDWR)
-            os.write(message_file, lines)
-            os.close(message_file)
-        file_number = int(file_number)
-        file_number = file_number + 1
-    return message_file
     """
     with open(str(file_number)+'.txt', 'wb') as output_file:
         output_file.write(lines)
