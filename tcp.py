@@ -245,7 +245,7 @@ def receive_num_lines(data_socket):
     :author: Lucas Gral
     """
     num_lines_bytes = b''
-    for i in range(0, 4): #call four times
+    for i in range(0, 4):  # call four times
         num_lines_bytes += next_byte(data_socket)
 
     return int.from_bytes(num_lines_bytes, 'big')
